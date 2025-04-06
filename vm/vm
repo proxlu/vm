@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# by: edu@bodhi
+
+# Especificar Window Manager aqui
+wm=enlightenment_start
+
+# Não editar daqui em diante
+case $1 in
+	-e|-E|--e|--E|-edit|-EDIT|--edit|--EDIT) editor ~/.vm
+	;;
+	-k|-K|--k|--K|-kill|-KILL|--kill|--KILL) pkill .vm
+	echo 'Comandos encerrados'
+	;;
+	-v|-V|--v|--V|-version|-VERSION|--version|--VERSION) echo 'vm 1.0
+Copyright (C) 2018 Free Software Foundation, Inc.
+Licença GPLv3+: GNU GPL versão 3 ou posterior <https://gnu.org/licenses/gpl.html>
+Este é um software livre: você é livre para alterá-lo e redistribuí-lo.
+NÃO HÁ QUALQUER GARANTIA, na máxima extensão permitida em lei.
+
+Escrito por: edu@bodhi'
+	;;
+	-*) echo "Uso: vm [OPÇÃO] <COMANDO> ...
+Máquina virtual do $wm.
+
+  Opções:
+  -e, --edit             edita os comandos de inicialização
+  -k, --kill             mata os comandos de inicialização
+  -d, --debug            mostra logs dos comandos de inicialização
+  - , --                 interrompe o processamento de argumentos
+  <COMANDO>              executa um comando no lugar da inicialização
+  -h, --help             mostra esta ajuda e sai
+  -v, --version          informa a versão e sai
+
+Escrito por: edu@bodhi"
+	;;
+	*) firejail --noprofile --x11=xephyr $wm&>/dev/null&
+	echo "VM iniciada com: $wm"
+	sleep 5
+	value=$(ps e -u $(whoami)|sed -rn 's/.* DISPLAY=(:[0-9]*.D).*/\1/p'|tr -d ' D'|tail -1)
+	if [[ -n $1 ]]
+	then
+	case $1 in
+		-|--) [[ -n $2 ]]&&shift
+		DISPLAY=$value $@&>/dev/null&
+		;;
+		-d|--d|-D|--D|-debug|--debug|-DEBUG|--DEBUG) shift
+		[[ $1 = - ]]||[[ $1 = -- ]]&&shift
+		[[ -z $1 ]]&&DISPLAY=$value ~/.vm||DISPLAY=$value $@
+		;;
+		*) DISPLAY=$value $@&>/dev/null&
+		;;
+	esac
+	else
+	DISPLAY=$value ~/.vm&>/dev/null&
+	fi
+	;;
+esac

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Exec=vm
+Name=Máquina virtual
+Comment=Máquina virtual
+Categories=Development;
+Icon=vm
